@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\KarakterController;
@@ -32,7 +33,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/datatable', [EmployeeController::class, 'datatable'])->name('datatable');
         Route::resource('', EmployeeController::class, ['parameters' => ['' => 'id']]);
     });
-    
+
+    Route::name('report.')->prefix('report')->group(function () {
+        Route::post('/datatable', [ReportController::class, 'datatable'])->name('datatable');
+        Route::resource('', ReportController::class, ['parameters' => ['' => 'id']]);
+    });
     
     Route::post('/karakter/datatable', [KarakterController::class, 'datatable'])->name('karakter.datatable');
     Route::get('/karakter', [KarakterController::class, 'index'])->name('karakter.index');

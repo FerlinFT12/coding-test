@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Manager;
 use App\Models\Person;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request as FacadesRequest;
 use Yajra\DataTables\Facades\DataTables;
 
-class EmployeeController extends Controller
+class ReportController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data['title'] = 'Employee List';
+        $data['title'] = 'Report';
         
-        return view('employees.index', $data);
+        return view('report.index', $data);
     }
 
     /**
@@ -134,42 +136,68 @@ class EmployeeController extends Controller
     public function datatable(Request $request)
     {
         $query = Employee::query();
+        $totalDays = 20; //asumsi hari kerja sebulan
+        // asumsi tunjangan harian makan + transportasi = 40.000
+        $tunjangan_harian = 40000;
+
         return DataTables::of($query)
             ->addColumn('name', function ($model) {
                 $string = '';
                 $string = $model->person->name;
                 return $string;
             })
-            ->addColumn('email', function ($model) {
+            ->addColumn('jumlah_hadir', function ($model) {
                 $string = '';
-                $string = $model->person->email;
+                $string = $model->attendances->where('present',1)->count();
                 return $string;
             })
-            ->addColumn('phone', function ($model) {
-                $string = '';
-                $string = $model->person->phone;
-                return $string;
+            ->addColumn('tunjangan_hadir', function ($model) use ($tunjangan_harian, $totalDays) {
+                $total = 0;
+                $attendedDays = $model->attendances->where('present',1)->count();
+                $hadir = ($attendedDays / $totalDays);
+                
+                if ($hadir >= 1) { //jika full hadir sebulan
+                    $tunjangan_makan = $tunjangan_harian * $attendedDays;
+                    $total = $tunjangan_makan + $model->salary;
+                } else {
+                    if($hadir < 0.5) {
+                        $tunjangan_makan = 0;
+                        $total = $tunjangan_makan + $model->salary;
+                    }
+                }
+                return $total;
             })
-            ->addColumn('bonus', function ($model) {
-                $string = 0;
-                $string = isset($model->manager) ? $model->manager->bonus : 0;
-                return $string;
-            })
-            ->addColumn('total_earning', function ($model) {
-                $string = 0;
-                $string = isset($model->manager) ? $model->manager->totalEarnings() : 0;
-                return $string;
-            })
+            
+            // ->addColumn('email', function ($model) {
+            //     $string = '';
+            //     $string = $model->person->email;
+            //     return $string;
+            // })
+            // ->addColumn('phone', function ($model) {
+            //     $string = '';
+            //     $string = $model->person->phone;
+            //     return $string;
+            // })
+            // ->addColumn('bonus', function ($model) {
+            //     $string = 0;
+            //     $string = isset($model->manager) ? $model->manager->bonus : 0;
+            //     return $string;
+            // })
+            // ->addColumn('total_earning', function ($model) {
+            //     $string = 0;
+            //     $string = isset($model->manager) ? $model->manager->totalEarnings() : 0;
+            //     return $string;
+            // })
 
             ->addColumn('action', function ($model) {
                 $string = '<div class="btn-group">';
-                $string .= '<a href="' . route('employee.edit', ['id' => base64_encode($model->id)]) . '" type="button"  class="btn btn-sm btn-info" title="Edit Employee"><i class="fas fa-edit"></i></a>';
-                $string .= '&nbsp;&nbsp;<a href="' . route('employee.destroy', ['id' => base64_encode($model->id)]) . '" type="button" class="btn btn-sm btn-danger btn-delete" title="Remove"><i class="fa fa-trash"></i></a>';
+                // $string .= '<a href="' . route('employee.edit', ['id' => base64_encode($model->id)]) . '" type="button"  class="btn btn-sm btn-info" title="Edit Employee"><i class="fas fa-edit"></i></a>';
+                // $string .= '&nbsp;&nbsp;<a href="' . route('employee.destroy', ['id' => base64_encode($model->id)]) . '" type="button" class="btn btn-sm btn-danger btn-delete" title="Remove"><i class="fa fa-trash"></i></a>';
                 $string .= '</div>';
                 return $string;
             })
             ->addIndexColumn()
-            ->rawColumns(['name','email','phone','action'])
+            ->rawColumns(['name','jumlah_hadir','tunjangan_hadir','action'])
             ->make(true);
     }
 }

@@ -45,6 +45,14 @@ return new class extends Migration
             $table->foreign('id')->references('id')->on('employees')
                 ->onUpdate('cascade')->onDelete('cascade');
         });
+
+        Schema::create('attendances', function (Blueprint $table) {
+            $table->id();
+            $table->integer('employee_id');
+            $table->date('date');
+            $table->string('present',2);
+            $table->timestamps();
+        });
     }
 
     /**
@@ -56,5 +64,6 @@ return new class extends Migration
         Schema::dropIfExists('person');
         Schema::dropIfExists('employees');
         Schema::dropIfExists('managers');
+        Schema::dropIfExists('attendances');
     }
 };

@@ -162,6 +162,13 @@
                                 <p>Cek Karakter</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('report.index') }}"
+                                class="nav-link @if ($segments[0] == 'report') active @endif">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Report</p>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
