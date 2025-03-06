@@ -126,10 +126,10 @@ class EmployeeController extends Controller
         $id = base64_decode($id);
         $employee = Employee::find($id);
         if(isset($employee->manager)) {
-            Manager::find($employee->id)->delete();
+            Manager::where('id',$employee->id)->delete();
         }
-        Person::find($id)->delete();
-        Employee::find($id)->delete();
+        Person::where('id',$id)->delete();
+        Employee::where('id',$id)->delete();
     }
 
     public function datatable(Request $request)

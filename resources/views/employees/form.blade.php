@@ -145,8 +145,7 @@
                                     </small>
                                 @enderror
                             </div>
-                        </div>
-
+                        </div>                   
                         <div class="float-right">
                             <button type="submit" id="save" class="btn btn-primary">Save</button>
                         </div>
@@ -170,7 +169,10 @@
         }
 
         $(function() {
-            $('.bonus').hide();
+        $('.bonus').hide();
+        @if ($model->exists && isset($model->manager))        
+            $('.bonus').show();
+        @endif
 
             $("#is_manager").change(function () {
                 if ($(this).is(":checked")) {
