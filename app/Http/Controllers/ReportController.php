@@ -163,6 +163,8 @@ class ReportController extends Controller
                     if($hadir < 0.5) {
                         $tunjangan_makan = 0;
                         $total = $tunjangan_makan + $model->salary;
+                    } else {
+                        $tunjangan_makan = $tunjangan_harian * $attendedDays / 2;
                     }
                 }
                 return $total;
