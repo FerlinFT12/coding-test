@@ -165,6 +165,7 @@ class ReportController extends Controller
                         $total = $tunjangan_makan + $model->salary;
                     } else {
                         $tunjangan_makan = $tunjangan_harian * $attendedDays / 2;
+                        $total = $tunjangan_makan + $model->salary;
                     }
                 }
                 return $total;
